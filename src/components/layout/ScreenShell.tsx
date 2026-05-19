@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DESIGN_SYSTEM_SCREENS } from '@/navigation/types';
 import type { RootStackParamList } from '@/navigation/types';
+
+const STEP_SCROLL_PADDING = 16;
 
 interface ScreenShellProps {
   title: string;
@@ -18,8 +20,40 @@ export function ScreenShell({ title, subtitle, children }: ScreenShellProps) {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const stepScrollRef = useRef<ScrollView>(null);
+  const stepOffsetsRef = useRef<number[]>([]);
   const currentIndex = DESIGN_SYSTEM_SCREENS.findIndex(
     screen => screen.name === route.name,
+  );
+
+  const scrollToActiveStep = useCallback(() => {
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const offset = stepOffsetsRef.current[currentIndex];
+    if (offset === undefined) {
+      return;
+    }
+
+    stepScrollRef.current?.scrollTo({
+      x: Math.max(0, offset - STEP_SCROLL_PADDING),
+      animated: true,
+    });
+  }, [currentIndex]);
+
+  useEffect(() => {
+    scrollToActiveStep();
+  }, [route.name, scrollToActiveStep]);
+
+  const handleStepLayout = useCallback(
+    (index: number, x: number) => {
+      stepOffsetsRef.current[index] = x;
+      if (index === currentIndex) {
+        scrollToActiveStep();
+      }
+    },
+    [currentIndex, scrollToActiveStep],
   );
 
   return (
@@ -31,6 +65,7 @@ export function ScreenShell({ title, subtitle, children }: ScreenShellProps) {
         <Text className="mt-1 text-xl font-bold text-slate-900">{title}</Text>
         <Text className="mt-1 text-sm text-slate-500">{subtitle}</Text>
         <ScrollView
+          ref={stepScrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
           className="mt-3"
@@ -43,6 +78,9 @@ export function ScreenShell({ title, subtitle, children }: ScreenShellProps) {
                 accessibilityRole="button"
                 accessibilityState={{ selected: isActive }}
                 onPress={() => navigation.navigate(screen.name)}
+                onLayout={event =>
+                  handleStepLayout(index, event.nativeEvent.layout.x)
+                }
                 className={`rounded-full px-3 py-1.5 ${
                   isActive ? 'bg-indigo-600' : 'bg-slate-100'
                 }`}>

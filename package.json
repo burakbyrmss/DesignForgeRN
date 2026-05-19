@@ -2,13 +2,29 @@
   "name": "DesignForgeRN",
   "version": "0.0.1",
   "private": true,
-  "scripts": {
+"scripts": {
+    "api:generate": "orval --config ./orval.config.js",
+    "api:generate:watch": "orval --config ./orval.config.js --watch",
+    "start": "react-native start",
+    "start:cache": "react-native start --reset-cache",
+    "reset-project": "node ./scripts/reset-project.js",
+    "bump-version": "node ./scripts/bump-version.js",
+    "bump-build": "node ./scripts/bump-build.js",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "start": "react-native start",
-    "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "ios:pods": "cd ios && pod install && cd ..",
+    "ios:clean": "xcodebuild -workspace ios/DesignForgeRN.xcworkspace -scheme DesignForgeRN -configuration Release clean",
+    "ios:archive": "mkdir -p ios/build && xcodebuild -workspace ios/DesignForgeRN.xcworkspace -scheme DesignForgeRN -configuration Release -sdk iphoneos -archivePath ios/build/DesignForgeRN.xcarchive archive",
+    "ios:export": "xcodebuild -allowProvisioningUpdates -exportArchive -archivePath ios/build/DesignForgeRN.xcarchive -exportPath ios/build/export -exportOptionsPlist ios/exportOptions.appstore.plist",
+    "ios:ipa": "npm run ios:archive && npm run ios:export",
+    "ios:open:outputs": "open ios/build || true",
+    "android:clean": "cd android && ./gradlew clean",
+    "android:aab": "cd android && ./gradlew bundleRelease",
+    "android:apk": "cd android && ./gradlew assembleRelease",
+    "android:open:outputs": "open android/app/build/outputs || true",
+    "test": "jest --forceExit",
+    "postinstall": "npx pod-install || true"
   },
   "dependencies": {
     "@react-native-clipboard/clipboard": "^1.16.3",
@@ -20,7 +36,6 @@
     "react": "19.2.3",
     "react-native": "0.85.3",
     "react-native-gesture-handler": "^2.31.2",
-    "react-native-reanimated": "^4.3.1",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.25.0",
     "tailwindcss": "^3.4.19"

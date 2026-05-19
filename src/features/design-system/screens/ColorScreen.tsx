@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 import { SplitScreenLayout } from '@/components/layout/SplitScreenLayout';
 import { ScreenShell } from '@/components/layout/ScreenShell';
-import { ColorSwatchPicker } from '@/components/ui/ColorSwatchPicker';
+import { ColorPicker } from '@/components/ui/ColorPicker';
 import { FormSection } from '@/components/ui/FormSection';
 import { OptionChipGroup } from '@/components/ui/OptionChipGroup';
 import { ToggleRow } from '@/components/ui/ToggleRow';
@@ -21,10 +21,10 @@ export function ColorScreen() {
     <FormSection
       title="Color system"
       description="Pick a primary color and semantic palette behavior.">
-      <ColorSwatchPicker
+      <ColorPicker
         label="Primary color"
         value={answers.primaryColor}
-        onChange={value => updateAnswer('primaryColor', value)}
+        onChange={color => updateAnswer('primaryColor', color)}
       />
       <OptionChipGroup<ColorStylePreference>
         label="Style preference"

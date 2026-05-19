@@ -9,6 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 if (
   Platform.OS === 'android' &&
@@ -29,8 +30,10 @@ export function SplitScreenLayout({
   previewLabel = 'Live preview',
 }: SplitScreenLayoutProps) {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isWide = width >= 768;
   const [previewExpanded, setPreviewExpanded] = useState(true);
+  const previewBarBottomPadding = Math.max(insets.bottom, 8);
 
   const togglePreview = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -69,14 +72,16 @@ export function SplitScreenLayout({
         keyboardShouldPersistTaps="handled">
         {form}
       </ScrollView>
-      <View className="border-t border-slate-200 bg-white">
+      <View
+        className="border-t border-slate-200 bg-white"
+        style={{ paddingBottom: previewBarBottomPadding }}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
             previewExpanded ? 'Collapse live preview' : 'Expand live preview'
           }
           onPress={togglePreview}
-          className="flex-row items-center justify-between px-4 py-3 active:bg-slate-50">
+          className="min-h-11 flex-row items-center justify-between px-4 py-3 active:bg-slate-50">
           <Text className="text-sm font-semibold text-slate-700">{previewLabel}</Text>
           <Text className="text-xs font-medium text-indigo-600">
             {previewExpanded ? 'Hide' : 'Show'}
