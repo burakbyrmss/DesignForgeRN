@@ -24,6 +24,7 @@
     "android:apk": "cd android && ./gradlew assembleRelease",
     "android:open:outputs": "open android/app/build/outputs || true",
     "test": "jest --forceExit",
+    "clean": "bash ./scripts/clean.sh",
     "postinstall": "npx pod-install || true"
   },
   "dependencies": {
